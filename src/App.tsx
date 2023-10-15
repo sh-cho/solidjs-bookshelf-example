@@ -1,27 +1,47 @@
-import type { Component } from 'solid-js';
+import { Show, createSignal } from "solid-js";
+import { BookList } from "./BookList";
+import { AddBook } from "./AddBook";
 
-import logo from './logo.svg';
-import styles from './App.module.css';
+export type Book = {
+  title: string;
+  author: string;
+};
 
-const App: Component = () => {
+const initialBooks: Book[] = [
+  { title: "Code Complete", author: "Steve McConnell" },
+  { title: "The Hobbit", author: "J.R.R. Tolkien" },
+  { title: "Living a Feminist Life", author: "Sarah Ahmed" },
+];
+
+interface BookshelfProps {
+  name: string;
+}
+
+function Bookshelf(props: BookshelfProps) {
+  const [books, setBooks] = createSignal(initialBooks);
+  const [showForm, setShowForm] = createSignal(false);
+
+  const toggleForm = () => setShowForm(!showForm());
+
   return (
-    <div class={styles.App}>
-      <header class={styles.header}>
-        <img src={logo} class={styles.logo} alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          class={styles.link}
-          href="https://github.com/solidjs/solid"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn Solid
-        </a>
-      </header>
+    <div>
+      <h1>{props.name}'s Bookshelf</h1>
+      <BookList books={books()} />
+      <Show
+        when={showForm()}
+        fallback={<button onClick={toggleForm}>Open</button>}
+      >
+        <AddBook setBooks={setBooks}/>
+        <button onClick={toggleForm}>Hide</button>
+      </Show>
     </div>
   );
-};
+}
+
+function App() {
+  return (
+    <Bookshelf name="solid"/>
+  );
+}
 
 export default App;
